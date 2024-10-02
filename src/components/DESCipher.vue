@@ -17,7 +17,7 @@
         <h4>¿Cómo usar el formulario?</h4>
         <ol>
           <li>Introduzca el mensaje que desea cifrar o el texto cifrado que desea descifrar en el campo "Mensaje".</li>
-          <li>Escriba la clave secreta (mínimo 8 caracteres) para el cifrado o descifrado.</li>
+          <li>Escriba la clave secreta para el cifrado o descifrado.</li>
           <li>Haga clic en "Cifrar" para codificar el mensaje o "Descifrar" para recuperar el mensaje original.</li>
         </ol>
       </div>
@@ -36,17 +36,24 @@
             required
           />
         </div>
-        <div class="form-group mt-3">
+        <div class="form-group mt-3 position-relative">
           <label for="key">Clave Secreta</label>
-          <!-- Se oculta la clave con type="password" -->
+          <!-- Se oculta la clave con type="password", pero se controla con un botón para mostrarla -->
           <input
-            type="password"
+            :type="isPasswordVisible ? 'text' : 'password'"
             v-model="key"
             class="form-control"
             id="key"
-            placeholder="Escribe la clave secreta (mínimo 8 caracteres)"
+            placeholder="Escribe la clave secreta"
             required
           />
+          <!-- Ícono del ojo para mostrar/ocultar la contraseña -->
+          <i
+            class="bi"
+            :class="isPasswordVisible ? 'bi-eye-slash-fill' : 'bi-eye-fill'"
+            @click="togglePasswordVisibility"
+            style="position: absolute; top: 38px; right: 10px; cursor: pointer;"
+          ></i>
         </div>
         <div class="mt-3">
           <button
@@ -77,99 +84,69 @@
         </button>
       </div>
 
-      <!-- Alertas de éxito -->
-      <div v-if="showAlert" class="alert alert-info mt-2">
+      <!-- Alertas de éxito o advertencia -->
+      <div v-if="showAlert" class="alert" :class="alertType" role="alert">
         {{ alertMessage }}
       </div>
     </div>
 
     <!-- Acordeón para preguntas -->
     <div class="accordion mt-4" id="faqAccordion">
-  <!-- Acordeón 1: Gráfico de Rendimiento y Facilidad -->
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="headingOne">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-        Ver gráfico de Rendimiento y Facilidad
-      </button>
-    </h2>
-    <div
-      id="collapseOne"
-      class="accordion-collapse collapse"
-      aria-labelledby="headingOne"
-      data-bs-parent="#faqAccordion"
-    >
-      <div class="accordion-body">
-        <div>
-          <BarChart 
-            title="Rendimiento y Facilidad de Implementación Cifrado de Escítala" 
-            :rendimiento="5" 
-            :facilidad="6" 
-          />
+      <!-- Acordeón 1: Gráfico de Rendimiento y Facilidad -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+            Ver gráfico de Rendimiento y Facilidad
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            <div>
+              <BarChart 
+                title="Rendimiento y Facilidad de Implementación Cifrado DES" 
+                :rendimiento="5" 
+                :facilidad="6" 
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acordeón 2: ¿Qué es el cifrado DES? -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            ¿Qué es el cifrado DES?
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            El Cifrado DES (Data Encryption Standard) es un algoritmo de cifrado simétrico que usa una clave secreta para convertir texto plano en texto cifrado.
+          </div>
+        </div>
+      </div>
+
+      <!-- Acordeón 3: ¿Cómo se codifica y descifra? -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            ¿Cómo se codifica y descifra?
+          </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            El Cifrado DES divide el mensaje en bloques y aplica la clave para transformar los datos en varias rondas de cifrado.
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Acordeón 2: ¿Qué es el cifrado DES? -->
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="headingTwo">
-      <button
-        class="accordion-button collapsed"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#collapseTwo"
-        aria-expanded="false"
-        aria-controls="collapseTwo"
-      >
-        ¿Qué es el cifrado DES?
-      </button>
-    </h2>
-    <div
-      id="collapseTwo"
-      class="accordion-collapse collapse"
-      aria-labelledby="headingTwo"
-      data-bs-parent="#faqAccordion"
-    >
-      <div class="accordion-body">
-        El Cifrado DES (Data Encryption Standard) es un algoritmo de cifrado simétrico que usa una clave secreta de 56 bits para convertir texto plano en texto cifrado.
-      </div>
-    </div>
-  </div>
-
-  <!-- Acordeón 3: ¿Cómo se codifica y descifra? -->
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="headingThree">
-      <button
-        class="accordion-button collapsed"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#collapseThree"
-        aria-expanded="false"
-        aria-controls="collapseThree"
-      >
-        ¿Cómo se codifica y descifra?
-      </button>
-    </h2>
-    <div
-      id="collapseThree"
-      class="accordion-collapse collapse"
-      aria-labelledby="headingThree"
-      data-bs-parent="#faqAccordion"
-    >
-      <div class="accordion-body">
-        Para codificar, ingrese el mensaje y la clave secreta y haga clic en "Cifrar". Para descifrar, ingrese el mensaje cifrado y la misma clave secreta, y haga clic en "Descifrar".
-      </div>
-    </div>
-  </div>
-</div>
-
-  </div>
 </template>
 
 <script>
-// Necesitarás importar una biblioteca de cifrado para DES, como CryptoJS o similar.
 import CryptoJS from "crypto-js"; // Asegúrate de tener instalada la librería
 import BarChart from '@/components/BarChart.vue';  // Importar el componente reutilizable
+
 export default {
   components: {
     BarChart
@@ -183,43 +160,51 @@ export default {
       showHelp: false, // Control para mostrar la ayuda
       showAlert: false, // Control para mostrar alertas
       alertMessage: "", // Mensaje de alerta
+      alertType: "", // Tipo de alerta (success, warning, etc.)
+      isPasswordVisible: false, // Control de visibilidad de la contraseña
     };
   },
   methods: {
     toggleHelp() {
       this.showHelp = !this.showHelp;
     },
-    showAlertMessage(message) {
+    showAlertMessage(message, type = 'alert-info') {
       this.alertMessage = message;
+      this.alertType = type;
       this.showAlert = true;
       setTimeout(() => {
         this.showAlert = false;
       }, 2000); // Alerta visible por 2 segundos
     },
+    togglePasswordVisibility() {
+      this.isPasswordVisible = !this.isPasswordVisible;
+    },
     encrypt() {
-      // Encriptar usando DES
-      if (this.key.length !== 8) {
-        alert("La clave debe tener exactamente 8 caracteres.");
+      if (!this.message || !this.key) {
+        this.showAlertMessage('Los campos de mensaje y clave no pueden estar vacíos.', 'alert-warning');
         return;
       }
       const encrypted = CryptoJS.DES.encrypt(this.message, this.key).toString();
       this.encryptedMessage = encrypted; // Guardamos el mensaje cifrado
       this.result = encrypted;
-      this.showAlertMessage("Mensaje cifrado correctamente.");
+      this.showAlertMessage("Mensaje cifrado correctamente.", 'alert-success');
     },
     decrypt() {
-      // El descifrado solo es posible si el mensaje coincide con el mensaje cifrado
+      if (!this.message || !this.key) {
+        this.showAlertMessage('Los campos de mensaje y clave no pueden estar vacíos.', 'alert-warning');
+        return;
+      }
       if (this.message !== this.encryptedMessage) {
-        alert("El mensaje ingresado no coincide con el cifrado original.");
+        this.showAlertMessage("El mensaje ingresado no coincide con el cifrado original.", 'alert-warning');
         return;
       }
       try {
         const decrypted = CryptoJS.DES.decrypt(this.message, this.key).toString(CryptoJS.enc.Utf8);
         if (!decrypted) throw new Error("Clave incorrecta");
         this.result = decrypted;
-        this.showAlertMessage("Mensaje descifrado correctamente.");
+        this.showAlertMessage("Mensaje descifrado correctamente.", 'alert-success');
       } catch (error) {
-        alert("Clave incorrecta o mensaje corrupto.");
+        this.showAlertMessage("Clave incorrecta o mensaje corrupto.", 'alert-danger');
       }
     },
     copyToClipboard() {
@@ -229,7 +214,7 @@ export default {
       el.select();
       document.execCommand("copy");
       document.body.removeChild(el);
-      this.showAlertMessage("Resultado copiado al portapapeles.");
+      this.showAlertMessage("Resultado copiado al portapapeles.", 'alert-info');
     },
   },
 };
@@ -264,15 +249,14 @@ export default {
   max-width: 300px;
 }
 
-.help-text h4 {
-  margin-top: 0;
-}
-
-.position-absolute {
-  position: absolute;
-}
-
 .alert {
-  margin-top: 20px;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 </style>

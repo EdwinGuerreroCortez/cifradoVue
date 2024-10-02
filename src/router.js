@@ -7,6 +7,7 @@ import DSASignature from './components/DSASignature.vue';
 import About from './components/About.vue';
 
 const routes = [
+  { path: '/', component: CaesarCipher },
   { path: '/caesar', component: CaesarCipher },
   { path: '/scytale', component: ScytaleCipher },
   { path: '/des', component: DESCipher },

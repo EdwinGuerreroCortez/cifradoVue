@@ -11,7 +11,7 @@
     <div class="row">
       <!-- Columna Izquierda: Generar Claves -->
       <div class="col-md-4">
-        <div class="card p-3">
+        <div class="card p-3 position-relative" style="padding-top: 50px;">
           <div class="position-relative">
             <!-- Icono de ayuda -->
             <i class="bi bi-question-circle-fill help-icon" @click="toggleHelp"></i>
@@ -365,10 +365,15 @@ export default {
 
 .help-icon {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: -18px; /* Ajusta esto para colocarlo mejor */
+  left: -10px; /* Ajusta esto para alinearlo correctamente */
+  font-size: 24px;
+  color: #007bff;
   cursor: pointer;
+  z-index: 10; /* Asegura que el ícono esté por encima del contenido */
 }
+
+
 
 .help-message {
   position: absolute;
@@ -395,5 +400,9 @@ export default {
   text-align: center; /* Centra el texto de la alerta */
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Agrega una sombra para que destaque */
 }
+h5 {
+  margin-left: 15px; /* Aumenta este valor si es necesario */
+}
+
 
 </style>

@@ -1,5 +1,10 @@
 <template>
   <div class="container mt-4">
+    <!-- Alertas de Bootstrap -->
+    <div v-if="alertMessage" class="alert" :class="`alert-${alertType}`" role="alert">
+      {{ alertMessage }}
+    </div>
+
     <!-- Formulario con el ícono de ayuda -->
     <div class="card p-4 position-relative">
       <!-- Icono de ayuda en la esquina superior izquierda dentro del formulario -->
@@ -146,8 +151,12 @@
           data-bs-parent="#faqAccordion"
         >
           <div class="accordion-body">
-            Para codificar, se escribe el mensaje en filas sobre un cilindro de una longitud determinada (número de columnas) y se lee por columnas. Para descifrar, se reconstruye el texto original leyendo las filas de nuevo.
-          </div>
+            <strong>Codificación:</strong><br />
+                        - Dividir el mensaje en columnas.<br />
+                        - Leer las letras verticalmente para obtener el mensaje cifrado.<br /><br />
+                        <strong>Descifrado:</strong><br />
+                        - Colocar el mensaje cifrado en columnas.<br />
+                        - Leer horizontalmente para recuperar el mensaje original.          </div>
         </div>
       </div>
     </div>
@@ -167,6 +176,8 @@ export default {
       columns: 0,
       result: "",
       showHelp: false, // Control para mostrar la ayuda
+      alertMessage: '', // Almacena el mensaje de alerta
+      alertType: '', // Almacena el tipo de alerta (success, warning, etc.)
     };
   },
   methods: {
@@ -174,12 +185,30 @@ export default {
       this.showHelp = !this.showHelp;
     },
     encrypt() {
+      if (!this.message) {
+        this.showAlert('El campo de mensaje no puede estar vacío.', 'warning');
+        return;
+      }
+      if (!this.columns || this.columns <= 0) {
+        this.showAlert('Debe especificar un número válido de columnas.', 'warning');
+        return;
+      }
       let cleanMessage = this.message.replace(/\s+/g, '');
       this.result = this.scytaleCipher(cleanMessage, parseInt(this.columns));
+      this.showAlert('Texto cifrado correctamente.', 'success');
     },
     decrypt() {
+      if (!this.message) {
+        this.showAlert('El campo de mensaje no puede estar vacío.', 'warning');
+        return;
+      }
+      if (!this.columns || this.columns <= 0) {
+        this.showAlert('Debe especificar un número válido de columnas.', 'warning');
+        return;
+      }
       let cleanMessage = this.message.replace(/\s+/g, '');
       this.result = this.scytaleCipherDecrypt(cleanMessage, parseInt(this.columns));
+      this.showAlert('Texto descifrado correctamente.', 'success');
     },
     scytaleCipher(text, columns) {
       let rows = Math.ceil(text.length / columns);
@@ -218,7 +247,15 @@ export default {
       el.select();
       document.execCommand("copy");
       document.body.removeChild(el);
+      this.showAlert('Texto copiado al portapapeles', 'info');
     },
+    showAlert(message, type) {
+      this.alertMessage = message;
+      this.alertType = type;
+      setTimeout(() => {
+        this.alertMessage = '';
+      }, 3000); // Oculta la alerta después de 3 segundos
+    }
   },
 };
 </script>
@@ -228,19 +265,29 @@ export default {
   max-width: 500px;
 }
 
-.card {
-  position: relative; /* Necesario para que el ícono esté dentro del formulario */
+/* Estilos para las alertas */
+.alert {
+  position: fixed;
+  top: 10px; /* Ajusta esta posición según tus necesidades */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999; /* Asegura que esté por encima del contenido */
+  width: 300px; /* Ajusta el ancho de la alerta si es necesario */
+  text-align: center; /* Centra el texto de la alerta */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Agrega una sombra para que destaque */
 }
 
+/* Estilos para el ícono de ayuda */
 .help-icon {
   position: absolute;
-  top: 10px; /* Ajuste la posición del ícono dentro del formulario */
+  top: 10px;
   left: 10px;
   font-size: 24px;
   color: #007bff;
   cursor: pointer;
 }
 
+/* Estilos para el cuadro de texto de ayuda */
 .help-text {
   background-color: #f1f1f1;
   border: 1px solid #ddd;
@@ -254,9 +301,5 @@ export default {
 
 .help-text h4 {
   margin-top: 0;
-}
-
-.position-absolute {
-  position: absolute;
 }
 </style>

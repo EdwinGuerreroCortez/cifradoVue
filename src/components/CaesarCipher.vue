@@ -1,28 +1,26 @@
 <template>
   <div class="container mt-4">
-    
+    <h2 class="text-center">Cifrado César</h2>
 
-    <!-- Formulario del Cifrado César -->
-    <div style="min-height: 50px; position: relative;">
-      <div
-        v-if="showCopyAlert"
-        class="alert alert-success fixed-alert"
-        role="alert"
-      >
-        ¡Texto copiado al portapapeles!
-      </div>
-
-      <div
-        v-if="showResultAlert"
-        class="alert alert-info fixed-alert"
-        role="alert"
-      >
-        Operación completada correctamente.
-      </div>
+    <!-- Alertas de Bootstrap -->
+    <div v-if="alertMessage" class="alert" :class="`alert-${alertType}`" role="alert">
+      {{ alertMessage }}
     </div>
 
-    <div class="card p-4">
-      <h2 class="mb-3">Cifrado César</h2>
+    <div class="card p-4 position-relative">
+      <!-- Icono de ayuda -->
+      <i class="bi bi-question-circle-fill help-icon" @click="toggleHelp"></i>
+
+      <!-- Mensaje de ayuda -->
+      <div v-if="helpVisible" class="help-message">
+        <h4>¿Cómo usar el formulario?</h4>
+        <p>
+          1. Ingrese el mensaje en el campo "Mensaje".<br />
+          2. Ingrese el número de desplazamiento en el campo "Desplazamiento".<br />
+          3. Presione "CIFRAR" para cifrar el mensaje o "DESCIFRAR" para recuperar el mensaje original.
+        </p>
+      </div>
+
       <form @submit.prevent="encrypt">
         <div class="form-group">
           <label for="message">Mensaje</label>
@@ -47,18 +45,10 @@
           />
         </div>
         <div class="mt-3">
-          <button
-            class="btn btn-primary"
-            @click="encrypt"
-            type="button"
-          >
+          <button class="btn btn-primary" @click="encrypt" type="button">
             CIFRAR
           </button>
-          <button
-            class="btn btn-secondary ms-2"
-            @click="decrypt"
-            type="button"
-          >
+          <button class="btn btn-secondary ms-2" @click="decrypt" type="button">
             DESCIFRAR
           </button>
         </div>
@@ -66,11 +56,7 @@
       <div class="mt-4">
         <h5>Resultado:</h5>
         <p class="form-control">{{ result }}</p>
-        <button
-          class="btn btn-outline-primary"
-          v-if="result"
-          @click="copyToClipboard"
-        >
+        <button class="btn btn-outline-primary" v-if="result" @click="copyToClipboard">
           Copiar
         </button>
       </div>
@@ -80,7 +66,14 @@
     <div class="accordion mt-4" id="faqAccordion">
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseOne"
+            aria-expanded="false"
+            aria-controls="collapseOne"
+          >
             Ver gráfico de Rendimiento y Facilidad
           </button>
         </h2>
@@ -91,13 +84,13 @@
           data-bs-parent="#faqAccordion"
         >
           <div class="accordion-body">
-            <div>              
-              <BarChart 
-                title="Rendimiento y Facilidad de Implementación del Cifrado de César" 
-                :rendimiento="10" 
-                :facilidad="10" 
-                />
-          </div>
+            <div>
+              <BarChart
+                title="Rendimiento y Facilidad de Implementación del Cifrado de César"
+                :rendimiento="10"
+                :facilidad="10"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -121,9 +114,9 @@
           data-bs-parent="#faqAccordion"
         >
           <div class="accordion-body">
-            El Cifrado César es una técnica de cifrado en la que cada letra en
-            el texto original es sustituida por otra letra que se encuentra un
-            número fijo de posiciones más adelante en el alfabeto.
+            El Cifrado César es una técnica de cifrado antigua que consiste en desplazar cada letra del alfabeto un
+            número fijo de posiciones. Es uno de los cifrados más sencillos y fue usado por Julio César para proteger
+            sus mensajes.
           </div>
         </div>
       </div>
@@ -147,10 +140,10 @@
           data-bs-parent="#faqAccordion"
         >
           <div class="accordion-body">
-            Para codificar, se desplaza cada letra en el mensaje original hacia
-            adelante en el alfabeto según el número de desplazamiento. Para
-            descifrar, se hace lo contrario, desplazando las letras hacia
-            atrás.
+            <strong>Codificación:</strong><br />
+            - Cada letra del mensaje se desplaza un número fijo de posiciones en el alfabeto.<br />
+            <strong>Descifrado:</strong><br />
+            - Se realiza el desplazamiento inverso para recuperar el mensaje original.
           </div>
         </div>
       </div>
@@ -159,33 +152,53 @@
 </template>
 
 <script>
-import BarChart from '@/components/BarChart.vue';  // Importar el componente reutilizable
+import BarChart from '@/components/BarChart.vue'; // Importar el componente reutilizable
 
 export default {
   components: {
-    BarChart
+    BarChart,
   },
   data() {
     return {
-      message: "",
-      shift: 0,
-      result: "",
-      showCopyAlert: false,
-      showResultAlert: false,
+      message: '',
+      shift: '',
+      result: '',
+      alertMessage: '',
+      alertType: '',
+      helpVisible: false, // Controla la visibilidad del mensaje de ayuda
     };
   },
   methods: {
+    toggleHelp() {
+      this.helpVisible = !this.helpVisible; // Alterna la visibilidad de la ayuda
+    },
     encrypt() {
+      if (!this.message) {
+        this.showAlert('El campo de mensaje no puede estar vacío.', 'warning');
+        return;
+      }
+      if (!this.shift) {
+        this.showAlert('Debe elegir un número de desplazamiento.', 'warning');
+        return;
+      }
       this.result = this.caesarCipher(this.message, parseInt(this.shift));
-      this.showAlert('result');
+      this.showAlert('Texto cifrado correctamente.', 'success');
     },
     decrypt() {
+      if (!this.message) {
+        this.showAlert('El campo de mensaje no puede estar vacío.', 'warning');
+        return;
+      }
+      if (!this.shift) {
+        this.showAlert('Debe elegir un número de desplazamiento.', 'warning');
+        return;
+      }
       this.result = this.caesarCipher(this.message, -parseInt(this.shift));
-      this.showAlert('result');
+      this.showAlert('Texto descifrado correctamente.', 'success');
     },
     caesarCipher(text, shift) {
       return text
-        .split("")
+        .split('')
         .map((char) => {
           const code = char.charCodeAt(0);
           if (code >= 65 && code <= 90) {
@@ -199,31 +212,25 @@ export default {
             return char;
           }
         })
-        .join("");
+        .join('');
     },
     copyToClipboard() {
-      const el = document.createElement("textarea");
+      const el = document.createElement('textarea');
       el.value = this.result;
       document.body.appendChild(el);
       el.select();
-      document.execCommand("copy");
+      document.execCommand('copy');
       document.body.removeChild(el);
-      this.showAlert('copy');
+      this.showAlert('Texto copiado al portapapeles', 'info');
     },
-    showAlert(type) {
-      if (type === 'copy') {
-        this.showCopyAlert = true;
-        setTimeout(() => {
-          this.showCopyAlert = false;
-        }, 1000); // 1 segundo
-      } else if (type === 'result') {
-        this.showResultAlert = true;
-        setTimeout(() => {
-          this.showResultAlert = false;
-        }, 1000); // 1 segundo
-      }
-    }
-  }
+    showAlert(message, type) {
+      this.alertMessage = message;
+      this.alertType = type;
+      setTimeout(() => {
+        this.alertMessage = '';
+      }, 3000); // Oculta la alerta después de 3 segundos
+    },
+  },
 };
 </script>
 
@@ -233,17 +240,38 @@ export default {
 }
 
 /* Alertas que no mueven el contenido, se posicionan encima */
-.fixed-alert {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  opacity: 1;
-  transition: opacity 0.5s ease;
-  z-index: 10;
+.alert {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.fixed-alert[style*="display: none"] {
-  opacity: 0;
+/* Estilos para el ícono de ayuda */
+.help-icon {
+  position: absolute;
+  top: 1px;
+  left: 5px; /* Cambia 'right' por 'left' */
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #007bff;
+}
+
+
+/* Estilos para el mensaje de ayuda */
+.help-message {
+  position: absolute;
+  top: 40px;
+  left: 10px;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 10;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 300px;
 }
 </style>
